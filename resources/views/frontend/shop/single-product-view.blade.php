@@ -84,10 +84,10 @@
                             @if ($userOfferCount >= 3 || $acceptedOffer)
                                 <button class="btn btn-secondary mt-2" disabled>💬 Bargain Locked</button>
                             @else
-                                {{-- <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal"
+                                <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal"
                                     data-bs-target="#bargainModal">
                                     💬 Bargain System
-                                </button> --}}
+                                </button>
                             @endif
 
                             <!-- Bargain Modal -->
