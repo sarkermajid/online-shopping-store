@@ -90,15 +90,15 @@
 
                             $lineTotal = $finalPrice * $item->product_qty;
                         @endphp
-                        <td>{{ number_format($finalPrice, 2) }}</td>
-                        <td>{{ number_format($lineTotal, 2) }}</td>
+                        <td>{{ number_format($finalPrice, 2) }} {{ generalSettings('currency') }}</td>
+                        <td>{{ number_format($lineTotal, 2) }} {{ generalSettings('currency') }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
         <div class="total">
-            <p><strong>Total:</strong> {{ $order->total_price }}</p>
+            <p><strong>Total:</strong> {{ $order->total_price }} {{ generalSettings('currency') }}</p>
         </div>
     </div>
 

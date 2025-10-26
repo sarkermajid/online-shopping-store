@@ -77,8 +77,8 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <h5 class="px-2">Total Price: <span class="float-right">{{ $order->total_price }}
-                                        {{ $item->product->currency }}</span></h5>
+                                <h5 class="px-2">Total Price: <span class="float-right">{{ number_format($order->total_price,2) }}
+                                        {{ generalSettings('currency') }}</span></h5>
                             </div>
                         </div>
                     </div>

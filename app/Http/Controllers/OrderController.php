@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function allOrders()
     {
-        $allOrders = Order::all();
+        $allOrders = Order::orderBy('id','desc')->get();
 
         return view('admin.order.allorders', compact('allOrders'));
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutStoreRequest;
 use App\Models\ApplyPromoCode;
+use App\Models\Bargain;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -83,11 +84,27 @@ class CheckoutController extends Controller
     public function applyPromoCode(Request $request)
     {
         $carts = Cart::where('user_id', Auth::id())->get();
+        $cartTotalBalance = 0;
+
         if ($carts->count() > 0) {
+            $cartTotalBalance = 0;
+
             foreach ($carts as $cart) {
-                $cartTotalBalance = 0;
-                $cartTotalBalance += $cart->product->discount_amount ? $cart->product->discount_amount * $cart->product_qty : $cart->product->price * $cart->product_qty;
+                $bargain = Bargain::where('user_id', $cart->user_id)
+                    ->where('product_id', $cart->product_id)
+                    ->where('status', 1)
+                    ->latest()
+                    ->first();
+                if ($bargain) {
+                    $price = $bargain->offered_price;
+                } elseif ($cart->product->discount_amount) {
+                    $price = $cart->product->discount_amount;
+                } else {
+                    $price = $cart->product->price;
+                }
+                $cartTotalBalance += $price * $cart->product_qty;
             }
+            // dd($cartTotalBalance);
             $promoCode = PromoCode::where('code', $request->promo_code)->first();
             $applyPromoCode = ApplyPromoCode::where('user_id', auth()->user()->id)->first();
             if ($promoCode) {
