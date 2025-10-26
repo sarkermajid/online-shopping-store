@@ -98,7 +98,8 @@ class OrderController extends Controller
     public function generateInvoice($id)
     {
         $order = Order::find($id);
-        $pdf = Pdf::loadView('admin.order.order-invoice', compact('order'));
+        $user = User::where('id', $order->user_id)->first();
+        $pdf = Pdf::loadView('admin.order.order-invoice', compact('order','user'));
 
         return $pdf->stream('order-invoice.pdf');
     }

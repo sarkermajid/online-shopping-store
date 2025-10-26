@@ -46,16 +46,10 @@ Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact/message', [ContactController::class, 'message'])->name('contact.message');
 Route::get('/blogs', [FrontendBlogController::class, 'index'])->name('blogs');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
-
-// category wise product view route
 Route::get('/category/products/{id}', [ShopController::class, 'categoryProduct'])->name('category.product.view');
-// brand wise product view route
 Route::get('/brand/products/{id}', [ShopController::class, 'brandProduct'])->name('brand.product.view');
-// single product view route
 Route::get('/product/single/view/{id}', [ShopController::class, 'singleProduct'])->name('product.single.view');
-// single blog view route
 Route::get('blog/single/view/{id}', [FrontendBlogController::class, 'singleBlog'])->name('blog.single.view');
-// category wise blog route
 Route::get('/category/blog/view/{id}', [FrontendBlogController::class, 'categoryBlog'])->name('category.blog.view');
 
 // wishlist route
@@ -87,7 +81,6 @@ Route::post('/search-product', [HomeController::class, 'productSearch'])->name('
 
 Route::middleware(['auth'])->group(function () {
     // user routes
-
     Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');
     Route::get('/user/edit/{id}', [UserProfileController::class, 'edit'])->name('user.edit');
     Route::post('/user/update/{id}', [UserProfileController::class, 'update'])->name('user.update');

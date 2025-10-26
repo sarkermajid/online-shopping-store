@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +34,8 @@
             margin-top: 20px;
         }
 
-        .items th, .items td {
+        .items th,
+        .items td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
@@ -45,6 +47,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="invoice">
@@ -73,21 +76,32 @@
             </thead>
             <tbody>
                 @foreach ($order->orderItem as $item)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->product->name }}</td>
-                    <td>{{ $item->product_qty }}</td>
-                    <td>{{ $item->price }} {{ $item->product->currency }}</td>
-                    <td>{{ $item->price * $item->product_qty }} {{ $item->product->currency }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $item->product->name }}</td>
+                        <td>{{ $item->product_qty }}</td>
+                        @php
+                            $acceptedBargainPrice = \App\Models\Bargain::where('user_id', $user->id)
+                                ->where('product_id', $item->Product->id)
+                                ->where('status', 1)
+                                ->value('offered_price');
+
+                            $finalPrice = $acceptedBargainPrice ?? ($item->discount_amount ?? $item->price);
+
+                            $lineTotal = $finalPrice * $item->product_qty;
+                        @endphp
+                        <td>{{ number_format($finalPrice, 2) }}</td>
+                        <td>{{ number_format($lineTotal, 2) }}</td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
 
         <div class="total">
-            <p><strong>Total:</strong> {{ $order->total_price }} {{ $item->product->currency }}</p>
+            <p><strong>Total:</strong> {{ $order->total_price }}</p>
         </div>
     </div>
 
 </body>
+
 </html>

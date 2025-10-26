@@ -147,7 +147,8 @@ class ProductController extends Controller
             return response()->json(['message' => 'You already used all 3 bargain chances.'], 403);
         }
 
-        $status = $request->offered_price >= $product->min_price ? 1 : 0;
+        $status = (float) $request->offered_price >= (float) $product->min_price ? 1 : 0;
+
 
         $bargain = Bargain::create([
             'user_id' => $userId,

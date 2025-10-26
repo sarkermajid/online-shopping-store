@@ -43,14 +43,23 @@
                                     ->first();
                             @endphp
                             @if ($acceptedBargain)
-                                <span class="text-success fw-bold">
+                                <span class="fw-bold">
                                     {{ number_format($acceptedBargain->offered_price, 2) }}
-                                    <small class="text-muted">(Your accepted offer)</small>
                                 </span>
                             @else
-                                <span class="fw-bold">
-                                    {{ number_format($product->discount_amount ?: $product->price, 2) }}
-                                </span>
+                                @if ($product->discount_amount)
+                                    <span class="text-muted" style="text-decoration: line-through">
+                                        Regular Price: {{ number_format($product->price, 2) }}
+                                    </span>
+                                    <br>
+                                    <span class="fw-bold  ms-2">
+                                        Discount Price: {{ number_format($product->discount_amount, 2) }}
+                                    </span>
+                                @else
+                                    <span class="fw-bold">
+                                        {{ number_format($product->price, 2) }}
+                                    </span>
+                                @endif
                             @endif
                             {{ generalSettings('currency') }}
                         </div>
@@ -77,19 +86,19 @@
 
                                 $acceptedOffer = \App\Models\Bargain::where('user_id', auth()->id())
                                     ->where('product_id', $product->id)
-                                    ->where('status', 'accepted')
+                                    ->where('status', 1)
                                     ->exists();
                             @endphp
-
-                            @if ($userOfferCount >= 3 || $acceptedOffer)
-                                <button class="btn btn-secondary mt-2" disabled>💬 Bargain Locked</button>
-                            @else
-                                <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal"
-                                    data-bs-target="#bargainModal">
-                                    💬 Bargain System
-                                </button>
+                            @if (auth()->user() && $product->min_price !== null)
+                                @if ($userOfferCount >= 3 || $acceptedOffer)
+                                    <button class="btn btn-secondary mt-2" disabled>💬 Bargain Locked</button>
+                                @else
+                                    <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal"
+                                        data-bs-target="#bargainModal">
+                                        💬 Bargain System
+                                    </button>
+                                @endif
                             @endif
-
                             <!-- Bargain Modal -->
                             <div class="modal fade" id="bargainModal" tabindex="-1" aria-labelledby="bargainModalLabel"
                                 aria-hidden="true">
@@ -261,7 +270,7 @@
     </section>
     <!-- Related Product Section End -->
 
-    <script>
+    {{-- <script>
         document.getElementById('submitOfferBtn').addEventListener('click', function() {
             const offer = document.getElementById('offerPrice').value;
             const responseEl = document.getElementById('offerResponse');
@@ -293,6 +302,53 @@
                     responseEl.classList.add('text-danger');
                 });
         });
+    </script> --}}
+
+
+    <script>
+        document.getElementById('submitOfferBtn').addEventListener('click', function() {
+            const offer = document.getElementById('offerPrice').value;
+            const responseEl = document.getElementById('offerResponse');
+            const submitBtn = document.getElementById('submitOfferBtn');
+
+            fetch('{{ route('product.bargain', $product->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        offered_price: offer
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    responseEl.textContent = data.message;
+                    responseEl.classList.remove('text-danger', 'text-success');
+
+                    if (data.status == 1) {
+                        responseEl.classList.add('text-success');
+                        submitBtn.disabled = true;
+                        setTimeout(() => {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById(
+                                'bargainModal'));
+                            modal.hide();
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        responseEl.classList.add('text-danger');
+                        if (data.message.includes('used all 3 bargain chances')) {
+                            submitBtn.disabled = true;
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    }
+                })
+                .catch(() => {
+                    responseEl.textContent = 'Something went wrong.';
+                    responseEl.classList.add('text-danger');
+                });
+        });
     </script>
+
 
 @endsection
