@@ -93,9 +93,9 @@
                                 @if ($userOfferCount >= 3 || $acceptedOffer)
                                     <button class="btn btn-secondary mt-2" disabled>💬 Bargain Locked</button>
                                 @else
-                                    <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal"
+                                    <button class="primary-btn mt-2 border-0" data-bs-toggle="modal"
                                         data-bs-target="#bargainModal">
-                                        💬 Bargain System
+                                        Bargain System
                                     </button>
                                 @endif
                             @endif
@@ -105,7 +105,7 @@
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content p-3 rounded-3 shadow">
                                         <div class="modal-header border-0">
-                                            <h5 class="modal-title fw-bold" id="bargainModalLabel">💬 Bargain System</h5>
+                                            <h3 class="modal-title fw-bold" id="bargainModalLabel">Bargain System</h3>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
@@ -116,22 +116,22 @@
                                             <div class="w-50 pe-3 border-end">
                                                 <label for="offerPrice" class="form-label">Enter your offer price</label>
                                                 <input type="number" id="offerPrice" class="form-control mb-3"
-                                                    placeholder="e.g. 950">
+                                                    placeholder="offer price">
 
-                                                <button id="submitOfferBtn" class="btn btn-success w-100">Submit
+                                                <button id="submitOfferBtn" class="primary-btn border-0">Submit
                                                     Offer</button>
 
                                                 <p id="offerResponse" class="mt-3 fw-bold text-center"></p>
                                             </div>
 
                                             <div class="w-45 ps-3 ml-3">
-                                                <h6 class="fw-bold">📋 Bargain Rules:</h6>
-                                                <ul class="small mt-2">
-                                                    <li>You can make a maximum of <strong>3 offers</strong> per product.
+                                                <h6 class="fw-bold mb-3">📋 Bargain Rules:</h6>
+                                                <ul class="small" style="padding-top: 0px; margin-top:0px">
+                                                    <li>1. You can make a maximum of <strong>3 offers</strong> per product.
                                                     </li>
-                                                    <li>If your offer is accepted, you can purchase the product at your
+                                                    <li>2. If your offer is accepted, you can purchase the product at your
                                                         offered price.</li>
-                                                    <li>If all your chances are used, you can only buy it at the original
+                                                    <li>3. If all your chances are used, you can only buy it at the original
                                                         price.</li>
                                                 </ul>
                                             </div>
@@ -146,14 +146,14 @@
                             @if ($product->weight)
                                 <li><b>Weight</b> <span>{{ $product->weight }}</span></li>
                             @endif
-                            <li><b>Share on</b>
+                            {{-- <li><b>Share on</b>
                                 <div class="share">
                                     <a href="#"><i class="fa fa-facebook"></i></a>
                                     <a href="#"><i class="fa fa-twitter"></i></a>
                                     <a href="#"><i class="fa fa-instagram"></i></a>
                                     <a href="#"><i class="fa fa-pinterest"></i></a>
                                 </div>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
                 </div>
