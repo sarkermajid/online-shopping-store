@@ -142,8 +142,8 @@
 
                                 <div class="checkout__input__checkbox">
                                     <label>
-                                        <input type="radio" name="payment_method" value="online">
-                                        Online Payment
+                                        <input type="radio" name="payment_method" value="stripe">
+                                        Stripe
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>

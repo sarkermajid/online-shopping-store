@@ -246,4 +246,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // Delivery Information routes
     Route::get('/delivery-information/create', [DeliveryInformationController::class, 'index'])->name('delivery-information');
     Route::post('/delivery-information/update/{id?}', [DeliveryInformationController::class, 'store'])->name('delivery-information.update');
+
+    Route::get('/stripe/success', [CheckoutController::class, 'stripeSuccess'])->name('stripe.success');
+    Route::get('/stripe/cancel', [CheckoutController::class, 'stripeCancel'])->name('stripe.cancel');
 });

@@ -14,6 +14,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Stripe\Stripe;
+use Stripe\Checkout\Session as StripeSession;
 
 class CheckoutController extends Controller
 {
@@ -34,57 +36,136 @@ class CheckoutController extends Controller
 
     public function placeOrder(CheckoutStoreRequest $request)
     {
+        $carts = Cart::where('user_id', auth()->user()->id)->get();
+
+        if ($carts->count() < 1) {
+            return redirect()->back()->with('error', 'Your cart is empty');
+        }
+
         if ($request->payment_method === 'cod') {
-            $carts = Cart::where('user_id', auth()->user()->id)->get();
+            $order = new Order();
+            $order->user_id = auth()->user()->id;
+            $order->name = $request->name;
+            $order->phone = $request->phone;
+            $order->address = $request->address;
+            $order->city = $request->city;
+            $order->zip_code = $request->zip_code;
+            $order->total_price = $request->total_price;
+            $order->tracking_number = rand(100000, 500000);
+            $order->payment_method = 'Cash on Delivery';
+            $order->save();
 
-            if ($carts->count() >= 1) {
-                $order = new Order();
-                $order->user_id = auth()->user()->id;
-                $order->name = $request->name;
-                $order->phone = $request->phone;
-                $order->address = $request->address;
-                $order->city = $request->city;
-                $order->zip_code = $request->zip_code;
-                $order->total_price = $request->total_price;
-                $order->tracking_number = rand(100000, 500000);
-                $order->save();
+            foreach ($carts as $cart) {
+                // create orderitem table
+                $orderItem = new OrderItem();
+                $orderItem->order_id = $order->id;
+                $orderItem->product_id = $cart->product_id;
+                $orderItem->product_qty = $cart->product_qty;
+                $orderItem->price = $cart->product->discount_amount ? $cart->product->discount_amount : $cart->product->price;
+                $orderItem->save();
 
-                foreach ($carts as $cart) {
-                    // create orderitem table
-                    $orderItem = new OrderItem();
-                    $orderItem->order_id = $order->id;
-                    $orderItem->product_id = $cart->product_id;
-                    $orderItem->product_qty = $cart->product_qty;
-                    $orderItem->price = $cart->product->discount_amount ? $cart->product->discount_amount : $cart->product->price;
-                    $orderItem->save();
-
-                    // product quantity decrement after oder place
-                    $product = Product::where('id', $orderItem->product_id)->first();
-                    $product->qty = $product->qty - $orderItem->product_qty;
-                    $product->update();
-                }
-
-                // user data update for easily order next time
-                if (auth()->user()->address == null || auth()->user()->city == null || auth()->user()->zip_close == null) {
-                    $user = User::where('id', auth()->user()->id)->first();
-                    $user->address = $request->address;
-                    $user->city = $request->city;
-                    $user->zip_code = $request->zip_code;
-                    $user->save();
-                }
-                // after order carts will be removed
-                $carts = Cart::where('user_id', auth()->user()->id)->get();
-                Cart::destroy($carts);
-
-                return redirect()->back()->with('message', 'Order Place successfully');
-            } else {
-                return redirect()->back()->with('error', 'Your cart is empty');
+                // product quantity decrement after oder place
+                $product = Product::where('id', $orderItem->product_id)->first();
+                $product->qty = $product->qty - $orderItem->product_qty;
+                $product->update();
             }
-        } elseif ($request->payment_method === 'online') {
-            dd('online');
+
+            // user data update for easily order next time
+            if (auth()->user()->address == null || auth()->user()->city == null || auth()->user()->zip_close == null) {
+                $user = User::where('id', auth()->user()->id)->first();
+                $user->address = $request->address;
+                $user->city = $request->city;
+                $user->zip_code = $request->zip_code;
+                $user->save();
+            }
+            // after order carts will be removed
+            $carts = Cart::where('user_id', auth()->user()->id)->get();
+            Cart::destroy($carts);
+
+            return redirect()->back()->with('message', 'Order Place successfully');
+        } elseif ($request->payment_method === 'stripe') {
+            Stripe::setApiKey(env('STRIPE_SECRET'));
+
+            $line_items = [];
+            foreach ($carts as $cart) {
+                $line_items[] = [
+                    'price_data' => [
+                        'currency' => 'bdt',
+                        'product_data' => [
+                            'name' => $cart->product->name,
+                        ],
+                        'unit_amount' => ($cart->product->discount_amount ?: $cart->product->price) * 100,
+                    ],
+                    'quantity' => $cart->product_qty,
+                ];
+            }
+
+            $checkout_session = StripeSession::create([
+                'payment_method_types' => ['card'],
+                'line_items' => $line_items,
+                'mode' => 'payment',
+                'success_url' => route('stripe.success') . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('stripe.cancel'),
+                'customer_email' => auth()->user()->email,
+            ]);
+
+            // Save pending order
+            $order = new Order();
+            $order->user_id = auth()->user()->id;
+            $order->name = $request->name;
+            $order->phone = $request->phone;
+            $order->address = $request->address;
+            $order->city = $request->city;
+            $order->zip_code = $request->zip_code;
+            $order->total_price = $request->total_price;
+            $order->tracking_number = rand(100000, 500000);
+            $order->payment_method = 'stripe';
+            $order->status = 0;
+            $order->transaction_id = $checkout_session->id;
+            $order->save();
+            foreach ($carts as $cart) {
+                // create orderitem table
+                $orderItem = new OrderItem();
+                $orderItem->order_id = $order->id;
+                $orderItem->product_id = $cart->product_id;
+                $orderItem->product_qty = $cart->product_qty;
+                $orderItem->price = $cart->product->discount_amount ? $cart->product->discount_amount : $cart->product->price;
+                $orderItem->save();
+            }
+            session(['order_id' => $order->id]);
+
+            return redirect($checkout_session->url);
         } else {
+            return back()->with('error', 'Please select a payment method.');
         }
     }
+
+    public function stripeSuccess(Request $request)
+    {
+        $order = Order::find(session('order_id'));
+        if ($order) {
+            $order->status = 1;
+            $order->save();
+
+            // Reduce product quantity
+            $carts = Cart::where('user_id', auth()->user()->id)->get();
+            foreach ($carts as $cart) {
+                $product = Product::find($cart->product_id);
+                $product->qty -= $cart->product_qty;
+                $product->save();
+            }
+
+            Cart::where('user_id', auth()->user()->id)->delete();
+        }
+
+        return redirect()->route('home')->with('message', 'Payment successful & Order placed!');
+    }
+
+    public function stripeCancel()
+    {
+        return redirect()->route('checkout')->with('error', 'Payment canceled!');
+    }
+
 
     public function applyPromoCode(Request $request)
     {

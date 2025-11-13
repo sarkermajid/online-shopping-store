@@ -35,6 +35,14 @@
                                             <td class="text-style">{{ $order->zip_code }}</td>
                                         </tr>
                                         <tr>
+                                            <td class="payment-title"><strong>Payment Method :</strong></td>
+                                            <td class="text-style">{{ $order->payment_method }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="payment-title"><strong>Order Status :</strong></td>
+                                            <td class="text-style">{{ $order->status == 0 ? 'Pending' : 'Completed' }}</td>
+                                        </tr>
+                                        <tr>
                                             <td class="payment-title"><strong>Date :</strong></td>
                                             <td class="text-style">{{ $order->created_at->format('m-d-Y') }}</td>
                                         </tr>
@@ -77,7 +85,8 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-                                <h5 class="px-2">Total Price: <span class="float-right">{{ number_format($order->total_price,2) }}
+                                <h5 class="px-2">Total Price: <span
+                                        class="float-right">{{ number_format($order->total_price, 2) }}
                                         {{ generalSettings('currency') }}</span></h5>
                             </div>
                         </div>
