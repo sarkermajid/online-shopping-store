@@ -132,27 +132,22 @@
                                     <span>{{ $cartTotalBalance != 0 ? number_format($cartTotalBalance, 2) : number_format($total, 2) }}
                                         {{ generalSettings('currency') }}</span>
                                 </div>
-                                {{-- <div class="checkout__input__checkbox">
-                                        <label for="payment">
-                                            Cash On Delivery
-                                            <input type="checkbox" id="payment">
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    </div>
-                                    <div class="checkout__input__checkbox">
-                                        <label for="paypal">
-                                            Bkash
-                                            <input type="checkbox" id="paypal">
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    </div>
-                                    <div class="checkout__input__checkbox">
-                                        <label for="paypal">
-                                            Nagad
-                                            <input type="checkbox" id="paypal">
-                                            <span class="checkmark"></span>
-                                        </label>
-                                    </div> --}}
+                                <div class="checkout__input__checkbox">
+                                    <label>
+                                        <input type="radio" name="payment_method" value="cod" checked>
+                                        Cash On Delivery
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+
+                                <div class="checkout__input__checkbox">
+                                    <label>
+                                        <input type="radio" name="payment_method" value="online">
+                                        Online Payment
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+
                                 <button type="submit" class="site-btn">PLACE ORDER</button>
                             </div>
                         </div>

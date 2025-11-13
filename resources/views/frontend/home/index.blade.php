@@ -116,7 +116,7 @@
                                 <ul class="product__item__pic__hover">
                                     <li><a href="#" data-id="{{ $product->id }}" class="addToWishlist"><i
                                                 class="fa fa-heart" style="margin-top:10px"></i></a></li>
-                                    <li><a href="{{ route('product.single.view', ['id' => $product->slug]) }}"><i
+                                    <li><a href="{{ route('product.single.view', ['id' => $product->id]) }}"><i
                                                 class="fa fa-eye" style="margin-top:10px"></i></a></li>
                                     @if ($product->qty > 0)
                                         <li><a href="#" data-id="{{ $product->id }}" class="directAddToCart"><i
@@ -148,7 +148,7 @@
                         <div class="latest-product__slider owl-carousel">
                             <div class="latest-prdouct__slider__item">
                                 @foreach ($latestProductsDesc as $latestProduct)
-                                    <a href="{{ route('product.single.view', ['id' => $latestProduct->slug]) }}"
+                                    <a href="{{ route('product.single.view', ['id' => $latestProduct->id]) }}"
                                         class="latest-product__item">
                                         <div class="latest-product__item__pic">
                                             <img src="{{ asset('admin/product-image/' . $latestProduct->image) }}"
@@ -171,7 +171,7 @@
                         <div class="latest-product__slider owl-carousel">
                             <div class="latest-prdouct__slider__item">
                                 @foreach ($trendingProducts as $trendingProduct)
-                                    <a href="{{ route('product.single.view', ['id' => $trendingProduct->slug]) }}"
+                                    <a href="{{ route('product.single.view', ['id' => $trendingProduct->id]) }}"
                                         class="latest-product__item">
                                         <div class="latest-product__item__pic">
                                             <img src="{{ asset('admin/product-image/' . $trendingProduct->image) }}"
@@ -349,8 +349,6 @@
                 tableBody.innerHTML = '';
 
                 if (data.length === 0) {
-                    tableBody.innerHTML =
-                        `<tr><td colspan="3" class="text-danger text-center">Product not found!</td></tr>`;
                     voiceStatus.innerHTML = `<span class="text-danger text-center">Product not found!.</span>`;
                 } else {
                     data.forEach(product => {
@@ -360,7 +358,7 @@
                             <td>${product.price}</td>
                             <td>${product.qty}</td>
                             <td>
-                                <a href="/product/single/view/${product.id}" class="btn btn-sm btn-danger">View</a>
+                                <a href="/product/single/view/${product.id}" class="btn btn-sm btn-dark">View</a>
                             </td>
                         </tr>`;
                     });
