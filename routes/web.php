@@ -53,7 +53,6 @@ Route::get('blog/single/view/{id}', [FrontendBlogController::class, 'singleBlog'
 Route::get('/category/blog/view/{id}', [FrontendBlogController::class, 'categoryBlog'])->name('category.blog.view');
 
 // wishlist route
-
 Route::get('/product/wishlist', [WishlistController::class, 'index'])->name('wishlist');
 Route::post('/add-to-wishlist', [WishlistController::class, 'addToWishList'])->name('wishlist.add');
 Route::post('/wishlist/delete', [WishlistController::class, 'wishlistDelete'])->name('wishlist.delete');
@@ -78,6 +77,7 @@ Route::get('/delivery-information', [DeliveryInformationController::class, 'view
 //  search routes
 Route::get('/search', [HomeController::class, 'productListAjax'])->name('product.list');
 Route::post('/search-product', [HomeController::class, 'productSearch'])->name('product.search');
+Route::get('/search-voice', [ProductController::class, 'search']);
 
 Route::middleware(['auth'])->group(function () {
     // user routes

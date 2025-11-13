@@ -33,8 +33,8 @@ class ShopController extends Controller
         $latestProducts = Product::where('status', 1)->orderBy('id', 'desc')->limit(4)->get();
         $category = Category::where('slug', $slug)->first();
         $products = Product::where('category_id', $category->id)
-                                ->where('status', 1)
-                                ->paginate(9);
+            ->where('status', 1)
+            ->paginate(9);
 
         return view('frontend.shop.category-wise-product', compact(
             'categories',
@@ -51,25 +51,35 @@ class ShopController extends Controller
         $latestProducts = Product::where('status', 1)->orderBy('id', 'desc')->limit(4)->get();
         $brand = Brand::where('slug', $slug)->first();
         $products = Product::where('brand_id', $brand->id)
-                                ->where('status', 1)
-                                ->paginate(9);
+            ->where('status', 1)
+            ->paginate(9);
 
         return view('frontend.shop.brand-wise-product', compact(
             'categories',
             'products',
             'latestProducts',
-            'brands'));
+            'brands'
+        ));
     }
 
     public function singleProduct($slug)
     {
-        $product = Product::where('slug', $slug)->first();
+        $product = Product::where('id', $slug)->first();
+
+        if (!$product) {
+            abort(404, 'Product not found');
+        }
+
         $product->trending = $product->trending + 1;
         $product->save();
-        $relatedProducts = Product::where('category_id', $product->category_id)->get();
+
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->get();
 
         return view('frontend.shop.single-product-view', compact('product', 'relatedProducts'));
     }
+
 
     public function priceRangeSearch(Request $request)
     {

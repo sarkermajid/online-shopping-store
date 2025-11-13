@@ -166,4 +166,25 @@ class ProductController extends Controller
                 : '❌ Offer rejected! Try again (you have ' . $remaining . ' tries left).',
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $name = $request->query('name');
+
+        $products = Product::query();
+
+        if ($name) {
+            $name = strtolower($name);
+
+            $products->where(function ($q) use ($name) {
+                $q->where('name', 'LIKE', "%{$name}%")
+                    ->orWhere('description', 'LIKE', "%{$name}%")
+                    ->orWhere('short_description', 'LIKE', "%{$name}%");
+            });
+        }
+
+        $products = $products->get(['id', 'name', 'price', 'qty', 'description', 'short_description']);
+
+        return response()->json($products);
+    }
 }
