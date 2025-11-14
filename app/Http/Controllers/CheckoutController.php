@@ -61,7 +61,7 @@ class CheckoutController extends Controller
                 $orderItem->order_id = $order->id;
                 $orderItem->product_id = $cart->product_id;
                 $orderItem->product_qty = $cart->product_qty;
-                $orderItem->price = $cart->product->discount_amount ? $cart->product->discount_amount : $cart->product->price;
+                $orderItem->price = $order->total_price;
                 $orderItem->save();
 
                 // product quantity decrement after oder place
@@ -94,7 +94,7 @@ class CheckoutController extends Controller
                         'product_data' => [
                             'name' => $cart->product->name,
                         ],
-                        'unit_amount' => ($cart->product->discount_amount ?: $cart->product->price) * 100,
+                        'unit_amount' => intval($request->total_price * 100),
                     ],
                     'quantity' => $cart->product_qty,
                 ];
@@ -120,7 +120,7 @@ class CheckoutController extends Controller
             $order->total_price = $request->total_price;
             $order->tracking_number = rand(100000, 500000);
             $order->payment_method = 'stripe';
-            $order->status = 0;
+            $order->status = 2;
             $order->transaction_id = $checkout_session->id;
             $order->save();
             foreach ($carts as $cart) {
@@ -129,11 +129,20 @@ class CheckoutController extends Controller
                 $orderItem->order_id = $order->id;
                 $orderItem->product_id = $cart->product_id;
                 $orderItem->product_qty = $cart->product_qty;
-                $orderItem->price = $cart->product->discount_amount ? $cart->product->discount_amount : $cart->product->price;
+                $orderItem->price = $order->total_price;
                 $orderItem->save();
-            }
-            session(['order_id' => $order->id]);
 
+                // product quantity decrement after oder place
+                $product = Product::where('id', $orderItem->product_id)->first();
+                $product->qty = $product->qty - $orderItem->product_qty;
+                $product->update();
+            }
+
+            // after order carts will be removed
+            $carts = Cart::where('user_id', auth()->user()->id)->get();
+            Cart::destroy($carts);
+
+            session(['order_id' => $order->id]);
             return redirect($checkout_session->url);
         } else {
             return back()->with('error', 'Please select a payment method.');

@@ -23,7 +23,7 @@
                             <tr>
                                 <td>{{ $order->tracking_number }}</td>
                                 <td>{{ number_format($order->total_price,2)  }} {{ generalSettings('currency') }}</td>
-                                <td>{{ $order->status == 0 ? 'Pending' : 'Completed' }}</td>
+                                <td>{{ $order->status == 2 ? 'Completed' : 'Pending' }}</td>
                                 <td><a href="{{ route('user.orders.view',['id'=>$order->id]) }}" class="login-btn">view</a></td>
                             </tr>
                             @endforeach

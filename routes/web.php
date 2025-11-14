@@ -78,7 +78,9 @@ Route::get('/delivery-information', [DeliveryInformationController::class, 'view
 Route::get('/search', [HomeController::class, 'productListAjax'])->name('product.list');
 Route::post('/search-product', [HomeController::class, 'productSearch'])->name('product.search');
 Route::get('/search-voice', [ProductController::class, 'search']);
-
+Route::post('/product/{id}/bargain', [ProductController::class, 'bargain'])
+    ->middleware('auth')
+    ->name('product.bargain');
 Route::middleware(['auth'])->group(function () {
     // user routes
     Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');
@@ -148,7 +150,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
         Route::get('/product/edit/{id}', 'edit')->name('product.edit');
         Route::post('/product/update/{id}', 'update')->name('product.update');
         Route::post('/product/delete', 'delete')->name('product.delete');
-        Route::post('/product/{id}/bargain', 'bargain')->name('product.bargain');
+        // Route::post('/product/{id}/bargain', 'bargain')->name('product.bargain');
     });
 
     // Blog Categories routes
