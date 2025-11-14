@@ -49,11 +49,13 @@
                             @else
                                 @if ($product->discount_amount)
                                     <span class="text-muted" style="text-decoration: line-through">
-                                        Regular Price: {{ number_format($product->price, 2) }}
+                                        Regular Price:
+                                        {{ number_format($product->price, 2) }}{{ generalSettings('currency') }}
                                     </span>
                                     <br>
                                     <span class="fw-bold  ms-2">
-                                        Discount Price: {{ number_format($product->discount_amount, 2) }}
+                                        Discount Price:
+                                        {{ number_format($product->discount_amount, 2) }}{{ generalSettings('currency') }}
                                     </span>
                                 @else
                                     <span class="fw-bold">
@@ -61,7 +63,6 @@
                                     </span>
                                 @endif
                             @endif
-                            {{ generalSettings('currency') }}
                         </div>
                         <p>{{ $product->short_description }}</p>
                         @if ($product->qty > 0)
@@ -157,6 +158,7 @@
                         </ul>
                     </div>
                 </div>
+                @if(isset($product->youtube_video_link))
                 <div class="col-lg-12">
                     <div class="product__details__tab">
                         <ul class="nav nav-tabs" role="tablist">
@@ -164,10 +166,6 @@
                                 <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab"
                                     aria-selected="true">Product Video</a>
                             </li>
-                            {{-- <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab"
-                                        aria-selected="false">Reviews <span>(1)</span></a>
-                                </li> --}}
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="tabs-1" role="tabpanel">
@@ -176,8 +174,15 @@
                                         <div class="it-blog-thumb mb-10 p-relative">
                                             @php
                                                 $youtubeUrl = $product->youtube_video_link;
-                                                parse_str(parse_url($youtubeUrl, PHP_URL_QUERY), $queryParams);
-                                                $videoId = $queryParams['v'] ?? null;
+                                                $videoId = null;
+
+                                                if (str_contains($youtubeUrl, 'youtu.be')) {
+                                                    $videoId = basename(parse_url($youtubeUrl, PHP_URL_PATH));
+                                                } else {
+                                                    // Normal YouTube link ?v=ID
+                                                    parse_str(parse_url($youtubeUrl, PHP_URL_QUERY), $queryParams);
+                                                    $videoId = $queryParams['v'] ?? null;
+                                                }
                                             @endphp
                                             <iframe width="100%" height="500"
                                                 src="https://www.youtube.com/embed/{{ $videoId }}" frameborder="0"
@@ -195,6 +200,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
                 <div class="col-lg-12">
                     <div class="product__details__tab">
                         <ul class="nav nav-tabs" role="tablist">
