@@ -18,7 +18,7 @@ class FrontendBlogController extends Controller
 
     public function singleBlog($slug)
     {
-        $blog = Blog::where('id', $slug)->first();
+        $blog = Blog::where('slug', $slug)->first();
         $blogCategories = BlogCategory::where('status', 1)->orderBy('id', 'desc')->get();
         $recentNews = Blog::orderBy('id', 'desc')->get();
 
