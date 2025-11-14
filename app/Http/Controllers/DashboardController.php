@@ -23,6 +23,7 @@ class DashboardController extends Controller
         $totalProducts = Product::count();
         $totalOrders = Order::count();
         $totalPromos = PromoCode::count();
+        $totalSells = Order::where('status',2)->sum('total_price');
 
         return view('admin.home.index', compact(
             'totalCategories',
@@ -32,7 +33,8 @@ class DashboardController extends Controller
             'totalMessages',
             'totalProducts',
             'totalOrders',
-            'totalPromos'
+            'totalPromos',
+            'totalSells'
         ));
     }
 }

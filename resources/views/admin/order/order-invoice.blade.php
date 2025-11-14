@@ -62,6 +62,8 @@
             <p>Address: {{ $order->address }}</p>
             <p>City: {{ $order->city }}</p>
             <p>Zip Code: {{ $order->zip_code }}</p>
+            <p>Payment Method: {{ $order->payment_method }}</p>
+            <p>Status: {{ $order->status == 2 ? 'Completed' : 'Pending' }}</p>
         </div>
 
         <table class="items">

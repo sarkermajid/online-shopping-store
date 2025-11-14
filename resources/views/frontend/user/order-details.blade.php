@@ -40,7 +40,7 @@
                                         </tr>
                                         <tr>
                                             <td class="payment-title"><strong>Order Status :</strong></td>
-                                            <td class="text-style">{{ $order->status == 0 ? 'Pending' : 'Completed' }}</td>
+                                            <td class="text-style">{{ $order->status == 2 ? 'Completed' : 'Pending' }}</td>
                                         </tr>
                                         <tr>
                                             <td class="payment-title"><strong>Date :</strong></td>
