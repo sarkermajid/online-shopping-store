@@ -78,9 +78,7 @@ Route::get('/delivery-information', [DeliveryInformationController::class, 'view
 Route::get('/search', [HomeController::class, 'productListAjax'])->name('product.list');
 Route::post('/search-product', [HomeController::class, 'productSearch'])->name('product.search');
 Route::get('/search-voice', [ProductController::class, 'search']);
-Route::post('/product/{id}/bargain', [ProductController::class, 'bargain'])
-    ->middleware('auth')
-    ->name('product.bargain');
+Route::post('/product/{id}/bargain', [ProductController::class, 'bargain'])->middleware('auth')->name('product.bargain');
 Route::middleware(['auth'])->group(function () {
     // user routes
     Route::get('/user/profile', [UserProfileController::class, 'index'])->name('user.profile');
@@ -88,16 +86,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/user/update/{id}', [UserProfileController::class, 'update'])->name('user.update');
     Route::get('/user/orders', [UserProfileController::class, 'orders'])->name('user.orders');
     Route::get('/user/orders/view/{id}', [UserProfileController::class, 'orderView'])->name('user.orders.view');
-
     // checkout routes
-
     Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('checkout');
-
     // Promo Code apply routes
     Route::get('/apply-promo-code', [CheckoutController::class, 'applyPromoCode'])->name('applyPromoCode');
-
     // Order place routes
-
     Route::post('/place_order', [CheckoutController::class, 'placeOrder'])->name('placeOrder');
 });
 
@@ -107,14 +100,12 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile Routes
-
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'index')->name('profile.index');
         Route::post('/profile/update/{id}', 'update')->name('profile.update');
     });
 
     // Categories Routes
-
     Route::controller(CategoryController::class)->group(function () {
         Route::get('/category/add', 'index')->name('category.add');
         Route::post('/category/store', 'store')->name('category.store');
@@ -127,7 +118,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     });
 
     // Brands Routes
-
     Route::controller(BrandController::class)->group(function () {
         Route::get('/brand/add', 'index')->name('brand.add');
         Route::post('/brand/store', 'store')->name('brand.store');
@@ -140,7 +130,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     });
 
     // Products routes
-
     Route::controller(ProductController::class)->group(function () {
         Route::get('/product/add', 'index')->name('product.add');
         Route::post('/product/store', 'store')->name('product.store');
@@ -150,11 +139,9 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
         Route::get('/product/edit/{id}', 'edit')->name('product.edit');
         Route::post('/product/update/{id}', 'update')->name('product.update');
         Route::post('/product/delete', 'delete')->name('product.delete');
-        // Route::post('/product/{id}/bargain', 'bargain')->name('product.bargain');
     });
 
     // Blog Categories routes
-
     Route::controller(BlogController::class)->group(function () {
         Route::get('/blog/category/add', 'blogCategoryIndex')->name('blog.category.add');
         Route::post('/blog/category/store', 'blogCategoryStore')->name('blog.category.store');
@@ -167,7 +154,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     });
 
     // Blogs Routes
-
     Route::controller(BlogController::class)->group(function () {
         Route::get('/blog/add', 'index')->name('blog.add');
         Route::post('/blog/store', 'store')->name('blog.store');
@@ -180,7 +166,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     });
 
     // Users Routes for admin
-
     Route::controller(UserController::class)->group(function () {
         Route::get('/user/admin/manage', 'manage')->name('user.admin.manage');
         Route::post('/user/admin/delete', 'delete')->name('user.admin.delete');
@@ -190,7 +175,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     });
 
     // Contact message routes
-
     Route::controller(ContactController::class)->group(function () {
         Route::get('/admin/contact/message', 'contactMessage')->name('admin.contact.message');
         Route::get('/admin/contact/message/view/{id}', 'contactMessageView')->name('admin.contact.message.view');
@@ -204,7 +188,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     });
 
     // Orders routes
-
     Route::controller(OrderController::class)->group(function () {
         Route::get('/orders/all', 'allOrders')->name('orders.all');
         Route::get('/order/view/{id}', 'view')->name('order.view');
@@ -220,7 +203,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     });
 
     // Promo Codes routes
-
     Route::controller(PromoCodeController::class)->group(function () {
         Route::get('/promo/create', 'index')->name('promo.add');
         Route::post('/promo/store', 'store')->name('promo.store');
@@ -248,7 +230,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function () {
     // Delivery Information routes
     Route::get('/delivery-information/create', [DeliveryInformationController::class, 'index'])->name('delivery-information');
     Route::post('/delivery-information/update/{id?}', [DeliveryInformationController::class, 'store'])->name('delivery-information.update');
-
+    // stripe routes
     Route::get('/stripe/success', [CheckoutController::class, 'stripeSuccess'])->name('stripe.success');
     Route::get('/stripe/cancel', [CheckoutController::class, 'stripeCancel'])->name('stripe.cancel');
 });
