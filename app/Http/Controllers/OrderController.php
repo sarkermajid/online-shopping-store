@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderStatusMail;
 use App\Models\Order;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
     public function allOrders()
     {
-        $allOrders = Order::orderBy('id','desc')->get();
+        $allOrders = Order::orderBy('id', 'desc')->get();
 
         return view('admin.order.allorders', compact('allOrders'));
     }
@@ -20,7 +22,7 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
         $user = User::where('id', $order->user_id)->first();
-        return view('admin.order.order-view', compact('order','user'));
+        return view('admin.order.order-view', compact('order', 'user'));
     }
 
     public function pending()
@@ -56,7 +58,8 @@ class OrderController extends Controller
         $pending = Order::find($request->order_id);
         $pending->status = 0;
         $pending->save();
-
+        // $user = User::where('user_id', $pending->user_id)->first();
+        // Mail::to($user->email)->send(new OrderStatusMail($user->name, $pending->status));
         return response()->json([
             'status' => 'success',
         ]);
@@ -67,7 +70,8 @@ class OrderController extends Controller
         $ontheway = Order::find($request->order_id);
         $ontheway->status = 1;
         $ontheway->save();
-
+        // $user = User::where('user_id',$ontheway->user_id)->first();
+        // Mail::to($user->email)->send(new OrderStatusMail($user->name,$ontheway->status));
         return response()->json([
             'status' => 'success',
         ]);
@@ -78,7 +82,8 @@ class OrderController extends Controller
         $completed = Order::find($request->order_id);
         $completed->status = 2;
         $completed->save();
-
+        // $user = User::where('user_id', $completed->user_id)->first();
+        // Mail::to($user->email)->send(new OrderStatusMail($user->name, $completed->status));
         return response()->json([
             'status' => 'success',
         ]);
@@ -89,7 +94,8 @@ class OrderController extends Controller
         $cancelOrders = Order::find($request->order_id);
         $cancelOrders->status = 3;
         $cancelOrders->save();
-
+        // $user = User::where('user_id', $cancelOrders->user_id)->first();
+        // Mail::to($user->email)->send(new OrderStatusMail($user->name, $cancelOrders->status));
         return response()->json([
             'status' => 'success',
         ]);
@@ -99,7 +105,7 @@ class OrderController extends Controller
     {
         $order = Order::find($id);
         $user = User::where('id', $order->user_id)->first();
-        $pdf = Pdf::loadView('admin.order.order-invoice', compact('order','user'));
+        $pdf = Pdf::loadView('admin.order.order-invoice', compact('order', 'user'));
 
         return $pdf->stream('order-invoice.pdf');
     }

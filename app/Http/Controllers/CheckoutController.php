@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CheckoutStoreRequest;
+use App\Mail\OrderStatusMail;
 use App\Models\ApplyPromoCode;
 use App\Models\Bargain;
 use App\Models\Cart;
@@ -15,6 +16,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Stripe\Stripe;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Checkout\Session as StripeSession;
 
 class CheckoutController extends Controller
@@ -81,7 +83,7 @@ class CheckoutController extends Controller
             // after order carts will be removed
             $carts = Cart::where('user_id', auth()->user()->id)->get();
             Cart::destroy($carts);
-
+            Mail::to($user->email)->send(new OrderStatusMail($user->name, $order->status));
             return redirect()->back()->with('message', 'Order Place successfully');
         } elseif ($request->payment_method === 'stripe') {
             Stripe::setApiKey(env('STRIPE_SECRET'));
