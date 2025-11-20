@@ -143,7 +143,8 @@ class CheckoutController extends Controller
             // after order carts will be removed
             $carts = Cart::where('user_id', auth()->user()->id)->get();
             Cart::destroy($carts);
-
+            $user = User::findOrFail($order->user_id);
+            Mail::to($user->email)->send(new OrderStatusMail($user->name, $order->status));
             session(['order_id' => $order->id]);
             return redirect($checkout_session->url);
         } else {
